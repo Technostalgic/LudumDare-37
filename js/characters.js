@@ -389,9 +389,13 @@ class player{
 			if(box.testOverlap(enemies[i].getCol(), c)){
 				sfx_hitenemy.play();
 				enemies[i].vel = enemies[i].pos.minus(this.pos).normalized(10);
+				enemies[i]._thinktimer = Math.random() * 20 + 30; // 30 - 50 ticks
+				enemies[i].mov += Math.random(Math.PI / 2);
+				enemies[i].seeking = false;
+			
 				this.vel = this.aimDir.multiply(-this.speed);
 				if(this.aimDir.y == 1)
-				this.vel.y -= 2;
+					this.vel.y -= 2;
 			} 
 		}
 	}
