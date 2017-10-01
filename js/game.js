@@ -9,12 +9,12 @@ var canvas = document.getElementById("canvas");
 var context = canvas.getContext("2d");
 var width = canvas.width;
 var height = canvas.height;
-var playtop = 70;
-var playleft = 10;
-var playright = width - 10;
-var playbottom = height - 10;
+var playtop = 70; 				// world top
+var playleft = 10;				// world left
+var playright = width - 10;		// world right
+var playbottom = height - 10;	// world bottom
 var _lastTime = 0;
-var dt = 0;
+var dt = 0; //stores amount of time passed between ticks
 
 // gameplay variables:
 var highscorestorage = "technonugget_ld37_highscore"; // the save key for the local storage of the browser
@@ -42,235 +42,303 @@ var sfx_placeblock = new Audio("audio/placeblock.wav");
 
 
 function clrCanvas(){
-  context.fillStyle = "#fff";
-  context.fillRect(0, 0, width, height);
+	/* function clrCanvas()
+		clears the screen to a blank white color
+	*/
+	context.fillStyle = "#fff";
+	context.fillRect(0, 0, width, height);
 }
 function assignControls(){
-  assignedcontrols = {
-    up: 38,
-    down: 40,
-    left: 37,
-    right: 39,
-    jump: 90,
-    build: 88,
-    break: 67
-  };
-  pressedControls = {
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-    jump: false,
-    build: false,
-    break: false
-  };
-  document.addEventListener("keydown", keyDown);
-  document.addEventListener("keyup", keyUp);
+	/* function assignControls()
+		assigns the default controls
+	*/
+	assignedcontrols = {
+		up: 38,
+		down: 40,
+		left: 37,
+		right: 39,
+		jump: 90,
+		build: 88,
+		break: 67
+	};
+	pressedControls = {
+		up: false,
+		down: false,
+		left: false,
+		right: false,
+		jump: false,
+		build: false,
+		break: false
+	};
+	document.addEventListener("keydown", keyDown);
+	document.addEventListener("keyup", keyUp);
 }
 function keyDown(args){
-  //console.log(args.keyCode);
-  if(setcontrols > 0){
-    setControl(args.keyCode);
-    return;
-  }
-  if(args.keyCode == 32){
-    if(lostgame || introgame){
-      if(setcontrols <= 0){
-        saveHigh();
-        startgame();
-      }
-    }
-  }
-  switch(args.keyCode){
-    case 13:
-      if(lostgame || introgame)
-        setControls_begin();
-      break;
-    case assignedcontrols.left: pressedControls.left = true;
-    break;
-    case assignedcontrols.right: pressedControls.right = true;
-    break;
-    case assignedcontrols.up: pressedControls.up = true;
-    break;
-    case assignedcontrols.down: pressedControls.down = true;
-    break;
-    case assignedcontrols.jump: pressedControls.jump = true;
-    break;
-    case assignedcontrols.break: pressedControls.break = true;
-    break;
-    case assignedcontrols.build: pressedControls.build = true;
-    break;
-  }
+	/* function keyDown(args)
+		function added to the `keydown` event listener
+		params:
+			args:{} - an object that's returned by the `keydown` event that contains
+			information about the keypress
+	*/
+	//console.log(args.keyCode);
+	
+	// sets the controls if in control setting mode
+	if(setcontrols > 0){
+		setControl(args.keyCode);
+		return;
+	}
+	if(args.keyCode == 32){
+		if(lostgame || introgame){
+			if(setcontrols <= 0){
+				saveHigh();
+				startgame();
+			}
+		}
+	}
+	switch(args.keyCode){
+		case 13:
+			if(lostgame || introgame)
+				setControls_begin();
+			break;
+		case assignedcontrols.left: 
+			pressedControls.left = true;
+			break;
+		case assignedcontrols.right: 
+			pressedControls.right = true;
+			break;
+		case assignedcontrols.up: 
+			pressedControls.up = true;
+			break;
+		case assignedcontrols.down: 
+			pressedControls.down = true;
+			break;
+		case assignedcontrols.jump: 
+			pressedControls.jump = true;
+			break;
+		case assignedcontrols.break: 
+			pressedControls.break = true;
+			break;
+		case assignedcontrols.build: 
+			pressedControls.build = true;
+			break;
+	}
 }
 function keyUp(args){
-  switch(args.keyCode){
-    case assignedcontrols.left: pressedControls.left = false;
-    break;
-    case assignedcontrols.right: pressedControls.right = false;
-    break;
-    case assignedcontrols.up: pressedControls.up = false;
-    break;
-    case assignedcontrols.down: pressedControls.down = false;
-    break;
-    case assignedcontrols.jump: pressedControls.jump = false;
-    break;
-    case assignedcontrols.break: pressedControls.break = false;
-    break;
-    case assignedcontrols.build: pressedControls.build = false;
-    break;
-  }
+	/* function keyUp(args)
+		function that is added to the `keyUp` event listener
+	*/
+	switch(args.keyCode){
+		case assignedcontrols.left: 
+			pressedControls.left = false;
+			break;
+		case assignedcontrols.right: 
+			pressedControls.right = false;
+			break;
+		case assignedcontrols.up: 
+			pressedControls.up = false;
+			break;
+		case assignedcontrols.down: 
+			pressedControls.down = false;
+			break;
+		case assignedcontrols.jump: 
+			pressedControls.jump = false;
+			break;
+		case assignedcontrols.break: 
+			pressedControls.break = false;
+			break;
+		case assignedcontrols.build: 
+			pressedControls.build = false;
+			break;
+	}
 }
 function init(){
-  console.clear();
-  loadHigh();
-  assignControls();
-  clrCanvas();
-  requestAnimationFrame(step);
-  startgame();
-  introgame = true;
+	/* function init()
+		initializes the game
+	*/
+	console.clear();
+	loadHigh();
+	assignControls();
+	clrCanvas();
+	requestAnimationFrame(step);
+	startgame();
+	introgame = true;
 }
 function step(){
-  update(dt);
-  requestAnimationFrame(step);
-  dt = (performance.now() - _lastTime) / 16.666;
-  _lastTime = performance.now();
+	/* function step()
+		called once per tick; is the main logic step
+	*/
+	update(dt);
+	requestAnimationFrame(step);
+	dt = (performance.now() - _lastTime) / 16.666;
+	_lastTime = performance.now();
 }
 function update(timescale){
-  //console.log(timescale);
-  if(timescale > 2){
-    dt = 1;
-    timescale = 1;
-  }
-  if(introgame){
-    draw();
-    return;
-  }
-  if(!lostgame)
-    p1.update();
-  updateEnemies();
-  updateCoins();
-  updateParticles();
-  draw();
+	/* function update(timescale)
+		the main logic step for in-game ticks
+	*/
+	//console.log(timescale);
+	if(timescale > 2){
+		dt = 1;
+		timescale = 1;
+	}
+	if(introgame){
+		draw();
+		return;
+	}
+	if(!lostgame)
+		p1.update();
+	updateEnemies();
+	updateCoins();
+	updateParticles();
+	draw();
 }
 function draw(){
-  clrCanvas();
-  drawBlocks();
-  if(!lostgame)
-    p1.draw();
-  drawEnemies();
-  drawCoins();
-  drawParticles();
-  drawBorders();
-  drawHUD();
-  if(introgame)
-    drawIntroScreen();
-  if(lostgame)
-    drawLoseScreen();
+	/* function draw()
+		renders everything on screen
+	*/
+	clrCanvas();
+	drawBlocks();
+	if(!lostgame)
+		p1.draw();
+	drawEnemies();
+	drawCoins();
+	drawParticles();
+	drawBorders();
+	drawHUD();
+	if(introgame)
+		drawIntroScreen();
+	if(lostgame)
+		drawLoseScreen();
 }
 
 function loadHigh(){
-  var hi = localStorage.getItem(highscorestorage);
-  if(hi)
-    hiscore = parseInt(hi);
-  else hiscore = 0;
+	/* function loadHigh()
+		loads the high score from the browser's local storage
+	*/
+	var hi = localStorage.getItem(highscorestorage);
+	if(hi)
+		hiscore = parseInt(hi);
+	else hiscore = 0;
 }
 function saveHigh(){
-  if(score > hiscore)
-    hiscore = score;
-  localStorage.setItem(highscorestorage, hiscore.toString());
+	/* function saveHigh()
+		saves the high score to the browser's local storage
+	*/
+	if(score > hiscore)
+		hiscore = score;
+	localStorage.setItem(highscorestorage, hiscore.toString());
 }
 
 function drawBorders(){
-  context.fillStyle = "#aaa";
-  context.strokeStyle = "#555";
-  context.lineWidth = 2;
-  context.fillRect(0,0,width, playtop); //top
-  context.fillRect(0,0,playleft, height); //left
-  context.fillRect(playright, 0, width - playleft, height); //right
-  context.fillRect(0, playbottom, width, height - playbottom) //bottom
-  context.strokeRect(playleft, playtop, playright - playleft, playbottom - playtop); //inner
+	/* function drawBorders()
+		draws the borders around the edges of the canvas
+	*/
+	context.fillStyle = "#aaa";
+	context.strokeStyle = "#555";
+	context.lineWidth = 2;
+	context.fillRect(0,0,width, playtop); //top
+	context.fillRect(0,0,playleft, height); //left
+	context.fillRect(playright, 0, width - playleft, height); //right
+	context.fillRect(0, playbottom, width, height - playbottom) //bottom
+	context.strokeRect(playleft, playtop, playright - playleft, playbottom - playtop); //inner
 }
 function drawHUD(){
-  context.fillStyle = "#000";
-  //score:
-  context.font = "28px sans-serif";
-  context.textAlign = "center";
-  context.fillText("SCORE: " + score.toString(), width / 2, 40);
-
-  //high:
-  context.font = "12px sans-serif";
-  context.textAlign = "center";
-  context.fillText("HI: " + hiscore.toString(), width / 2, 60);
-
-  //ammo:
-  context.fillStyle = "#888";
-  context.strokeStyle = "#222";
-  context.lineWidth = 4;
-  context.fillRect(20, 25, 30, 30);
-  context.strokeRect(20, 25, 30, 30);
-  context.font = "28px sans-serif";
-  context.fillStyle = "#000";
-  context.textAlign = "left";
-  context.fillText("×" + p1.ammo.toString(), 60, 50);
+	/* function drawHUD()
+		draws the heads up display
+	*/
+	context.fillStyle = "#000";
+	
+	//score:
+	context.font = "28px sans-serif";
+	context.textAlign = "center";
+	context.fillText("SCORE: " + score.toString(), width / 2, 40);
+	
+	//high:
+	context.font = "12px sans-serif";
+	context.textAlign = "center";
+	context.fillText("HI: " + hiscore.toString(), width / 2, 60);
+	
+	//ammo:
+	context.fillStyle = "#888";
+	context.strokeStyle = "#222";
+	context.lineWidth = 4;
+	context.fillRect(20, 25, 30, 30);
+	context.strokeRect(20, 25, 30, 30);
+	context.font = "28px sans-serif";
+	context.fillStyle = "#000";
+	context.textAlign = "left";
+	context.fillText("×" + p1.ammo.toString(), 60, 50);
 }
 function drawLoseScreen(){
-  context.fillStyle = "rgba(0,0,0,0.7)";
-  context.fillRect(playleft, playtop, playright - playleft, playbottom - playtop);
-  
-  if(setcontrols > 0){
-    drawControlScreen("#fff");
-    return;
-  }
-
-  context.fillStyle = "#fff";
-  context.textAlign = "center";
-  context.font = "48px sans-serif";
-  context.fillText("GAME OVER", width / 2, 200);
-  context.font = "12px sans-serif";
-  context.fillText("press the spacebar to lose again", width / 2, 220);
-  context.font = "24px sans-serif";
-  context.fillText(lostmessage, width / 2, 320);
-  context.font = "12px sans-serif";
-  context.fillText("press ENTER to set controls", width / 2, height - 12);
+	/* function drawLoseScreen()
+		draws the screen that appears when the player looses
+	*/
+	context.fillStyle = "rgba(0,0,0,0.7)";
+	context.fillRect(playleft, playtop, playright - playleft, playbottom - playtop);
+	
+	if(setcontrols > 0){
+		drawControlScreen("#fff");
+		return;
+	}
+	
+	context.fillStyle = "#fff";
+	context.textAlign = "center";
+	context.font = "48px sans-serif";
+	context.fillText("GAME OVER", width / 2, 200);
+	context.font = "12px sans-serif";
+	context.fillText("press the spacebar to lose again", width / 2, 220);
+	context.font = "24px sans-serif";
+	context.fillText(lostmessage, width / 2, 320);
+	context.font = "12px sans-serif";
+	context.fillText("press ENTER to set controls", width / 2, height - 12);
 }
 function drawIntroScreen(){
-  context.fillStyle = "rgba(255,255,255,0.7)";
-  context.fillRect(0, 0, width, height);
-  
-  if(setcontrols > 0){
-    drawControlScreen();
-    return;
-  }
-
-  context.fillStyle = "#000";
-  context.textAlign = "center";
-  context.font = "bold 48px sans-serif";
-  context.fillText("THE PIT", width / 2, 200);
-  context.font = "18px sans-serif";
-  context.fillText("press space to begin", width / 2, 230);
-  context.font = "12px sans-serif";
-  context.fillText("press ENTER to set controls", width / 2, height - 12);
+	/* function drawIntroScreen()
+		draws the screen that appears when the game loads
+	*/
+	context.fillStyle = "rgba(255,255,255,0.7)";
+	context.fillRect(0, 0, width, height);
+	
+	if(setcontrols > 0){
+		drawControlScreen();
+		return;
+	}
+	
+	context.fillStyle = "#000";
+	context.textAlign = "center";
+	context.font = "bold 48px sans-serif";
+	context.fillText("THE PIT", width / 2, 200);
+	context.font = "18px sans-serif";
+	context.fillText("press space to begin", width / 2, 230);
+	context.font = "12px sans-serif";
+	context.fillText("press ENTER to set controls", width / 2, height - 12);
 }
 function drawControlScreen(color = "#000"){
-  context.fillStyle = color;
-  context.textAlign = "center";
-  context.font = "bold 48px sans-serif";
-  context.fillText("Press key for " + getControlName(), width / 2, 200);
+	/* function drawControlScreen(color)
+		draws the screen that appears when the player is setting the controls
+	*/
+	context.fillStyle = color;
+	context.textAlign = "center";
+	context.font = "bold 48px sans-serif";
+	context.fillText("Press key for " + getControlName(), width / 2, 200);
 }
 
 function placeBlock(pos){
-  pos = snapPoint(pos);
-  for(var i = 0; i < enemies.length; i++){
-    if(enemies[i].pos.distance(pos) <= tilesize / 2)
-      return;
-  }
-  if(!pointCollision(pos)){
-    sfx_placeblock.currentTime = 0;
-    sfx_placeblock.play();
-    var blok = new block(pos.x, pos.y);
-    blocks.push(blok);
-    p1.ammo -= 1;
-  }
+	/* function placeBlock(pos)
+		places a block at the specified position
+	*/
+	pos = snapPoint(pos);
+	for(var i = 0; i < enemies.length; i++){
+		if(enemies[i].pos.distance(pos) <= tilesize / 2)
+			return;
+	}
+	if(!pointCollision(pos)){
+		sfx_placeblock.currentTime = 0;
+		sfx_placeblock.play();
+		var blok = new block(pos.x, pos.y);
+		blocks.push(blok);
+		p1.ammo -= 1;
+	}
 }
 function breakBlock(blok){
   p1._blockBreakParticles(blok);
