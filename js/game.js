@@ -341,114 +341,150 @@ function placeBlock(pos){
 	}
 }
 function breakBlock(blok){
-  p1._blockBreakParticles(blok);
-  blocks.splice(blocks.indexOf(blok), 1);
-  sfx_breakblock.currentTime = 0;
-  sfx_breakblock.play();
-  p1.ammo += 1;
-  p1.vel = p1.vel.minus(p1.aimDir.multiply(p1.speed / 2));
+	/* function breakBlock(blok)
+		breaks a specified block and gives the player ammo
+		params:
+			blok:block - the block to break
+	*/
+	p1._blockBreakParticles(blok);
+	blocks.splice(blocks.indexOf(blok), 1);
+	sfx_breakblock.currentTime = 0;
+	sfx_breakblock.play();
+	p1.ammo += 1;
+	p1.vel = p1.vel.minus(p1.aimDir.multiply(p1.speed / 2));
 }
 function pointCollision(point){
-  if(point.x <= playleft) return true;
-  if(point.x >= playright) return true;
-  if(point.y <= playtop) return true;
-  if(point.y >= playbottom) return true;
-  for(var i = 0; i < blocks.length; i += 1)
-    if(blocks[i].col.containsPoint(point))
-      return true;
-  return false;
+	/* function pointCollision(point)
+		sees if there is a collision at the specified location
+		params:
+			point:vec2 - the location to test
+	*/
+	if(point.x <= playleft) return true;
+	if(point.x >= playright) return true;
+	if(point.y <= playtop) return true;
+	if(point.y >= playbottom) return true;
+	for(var i = 0; i < blocks.length; i += 1)
+		if(blocks[i].col.containsPoint(point))
+			return true;
+	return false;
 }
 function boxCollision(bx){
-  if(bx.left() < playleft) return true;
-  if(bx.right() > playright) return true;
-  if(bx.top() <= playtop) return true;
-  if(bx.bottom() >= playbottom) return true;
-  for(var i = 0; i < blocks.length; i += 1)
-    if(box.testOverlap(blocks[i].col, bx))
-      return true;
-  return false;
+	/* function boxCollision(bx)
+		sees if there is a collision in the specified bounding box
+		params:
+			bx:box - the bounding box to test
+	*/
+	if(bx.left() < playleft) return true;
+	if(bx.right() > playright) return true;
+	if(bx.top() <= playtop) return true;
+	if(bx.bottom() >= playbottom) return true;
+	for(var i = 0; i < blocks.length; i += 1)
+		if(box.testOverlap(blocks[i].col, bx))
+			return true;
+	return false;
 }
 function snapPoint(vect, centered = true){
-  var a = new vec2(playleft, playtop);
-  var v = vect.minus(a).multiply(1 / tilesize);
-  v = new vec2(Math.floor(v.x), Math.floor(v.y));
-  v = v.multiply(tilesize);
-  if(centered)
-    return v.plus(a).plus(new vec2(tilesize / 2));
-  return v.plus(a);
+	/* function snapPoint()
+		snaps a screen coordinate to the screen coordinate of the tile that
+		it's in
+		params:
+			vect:vec2 - the point to convert, in screen coords
+			centered:Boolean - if centered, the coordinate's anchor is the center, 
+				otherwise it's top-left
+	*/
+	var a = new vec2(playleft, playtop);
+	var v = vect.minus(a).multiply(1 / tilesize);
+	v = new vec2(Math.floor(v.x), Math.floor(v.y));
+	v = v.multiply(tilesize);
+	if(centered)
+		return v.plus(a).plus(new vec2(tilesize / 2));
+	return v.plus(a);
 }
 function getTotalAmmo(){
-  return p1.ammo + blocks.length;
+	/* function getTotalAmmo()
+		returns the total amount of blocks there could possibly be in the world
+	*/
+	return p1.ammo + blocks.length;
 }
 function generateLoseMessage(){
-  var m = [
-  "Sucks to suck.",
-  "Well then. That's that.",
-  "lol",
-  "Your family will miss you dearly",
-  "¯\\_(ツ)_/¯",
-  "You did good ( ͡° ͜ʖ ͡°)",
-  "ಠ╭╮ಠ",
-  "(╯°□°）╯︵ ┻━┻"
-  ];
-  return m[Math.floor(Math.random() * m.length)];
+	/* function generateLoseMessage()
+		returns a random lose message selected from from a predefined list
+	*/
+	var m = [
+		"Sucks to suck.",
+		"Well then. That's that.",
+		"lol",
+		"Your family will miss you dearly",
+		"¯\\_(ツ)_/¯",
+		"You did good ( ͡° ͜ʖ ͡°)",
+		"ಠ╭╮ಠ",
+		"(╯°□°）╯︵ ┻━┻"
+		];
+	return m[Math.floor(Math.random() * m.length)];
 }
 
 function setControls_begin(){
-  setcontrols = 7;
+	/* function setControls_begin()
+		sets the global variable setControls to 7, initiating the control setting
+		mode where the player can set the controls
+	*/
+	setcontrols = 7;
 }
 function setControl(keycode){
-  switch(setcontrols){
-    case 7: assignedcontrols.right = keycode;
-    break;
-    case 6: assignedcontrols.left = keycode;
-    break;
-    case 5: assignedcontrols.up = keycode;
-    break;
-    case 4: assignedcontrols.down = keycode;
-    break;
-    case 3: assignedcontrols.break = keycode;
-    break;
-    case 2: assignedcontrols.build = keycode;
-    break;
-    case 1: assignedcontrols.jump = keycode;
-    break;
-  }
-  setcontrols--;
+	/* function setControl(keyCode)
+		sets the specified keycode to whichever control is being set at the time,
+		determined by the global variable `setcontrols`
+		params:
+			keycode:Number - the keyCode to assign
+	*/
+	switch(setcontrols){
+		case 7: assignedcontrols.right = keycode; break;
+		case 6: assignedcontrols.left = keycode; break;
+		case 5: assignedcontrols.up = keycode; break;
+		case 4: assignedcontrols.down = keycode; break;
+		case 3: assignedcontrols.break = keycode; break;
+		case 2: assignedcontrols.build = keycode; break;
+		case 1: assignedcontrols.jump = keycode; break;
+	}
+	setcontrols--;
 }
 function getControlName(){
-  switch(setcontrols){
-    case 7:
-    return "'RIGHT'";
-    case 6:
-    return "'LEFT'";
-    case 5: 
-    return "'UP'";
-    case 4: 
-    return "'DOWN'";
-    case 3: 
-    return "'ATTACK'";
-    case 2: 
-    return "'BUILD'";
-    case 1: 
-    return "'JUMP'";
-  }
+	/* function getControlName()
+		returns the name of the control that is currently being set
+	*/
+	switch(setcontrols){
+		case 7:	return "'RIGHT'";
+		case 6: return "'LEFT'";
+		case 5: return "'UP'";
+		case 4: return "'DOWN'";
+		case 3: return "'ATTACK'";
+		case 2: return "'BUILD'";
+		case 1: return "'JUMP'";
+	}
+	return "???";
 }
 function startgame(){
-  score = 0;
-  introgame = false;
-  lostgame = false;
-  p1 = new player();
-  enemies = [];
-  startcoin();
-  particles = [];
-  loadBlocks();
+	/* function startgame()
+		initiates the begining of a round
+	*/
+	score = 0;
+	introgame = false;
+	lostgame = false;
+	p1 = new player();
+	enemies = [];
+	startcoin();
+	particles = [];
+	loadBlocks();
 }
 function losegame(reason = generateLoseMessage()){
-  lostgame = true;
-  lostmessage = reason;
-  sfx_lose.play();
+	/* function losegame(reason)
+		ends the round
+		params:
+			reason:string - the message that is displayed on the game over screen
+	*/
+	lostgame = true;
+	lostmessage = reason;
+	sfx_lose.play();
 }
-
 
 init();
